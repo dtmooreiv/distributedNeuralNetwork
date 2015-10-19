@@ -25,7 +25,7 @@ ec2.describeInstances(params, function(error, data) {
         console.log(error); // an error occurred
     } else {
         var ec2IP = data.Reservations[0].Instances[0].NetworkInterfaces[0].Association.PublicIp;
-        var ec2Host = "[awsEc2]\n" + ec2IP + " ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws.pem\n\n";
+        var ec2Host = "[awsEc2]\n" + ec2IP + " ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem\n\n";
         fs.appendFile(hostsPath, ec2Host, function(err) {
             if(err) {
                 console.log("Error saving ec2 ip to file, err: " + err);

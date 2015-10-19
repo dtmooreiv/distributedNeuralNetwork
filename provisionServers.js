@@ -9,10 +9,10 @@ AWS.config.loadFromPath("./awsConfig.json");
 var ec2 = new AWS.EC2();
 
 var params = {
-  ImageId: 'ami-d05e75b8',
+  ImageId: 'ami-b141a2f5',
   InstanceType: 'g2.2xlarge', 
   MinCount: 1, MaxCount: 1,
-  KeyName: 'mac_aws'
+  KeyName: 'mac_aws_west'
 };
 
 ec2.runInstances(params, function(err, data) {
