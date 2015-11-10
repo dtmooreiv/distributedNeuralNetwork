@@ -314,7 +314,7 @@ if __name__ == '__main__':
     mini_batch_size = 10
     training_data, validation_data, test_data = load_data_shared()
     expanded_training_data, _, _ = load_data_shared(
-        "../data/mnist.pkl.gz")
+        "../data/mnist_expanded.pkl.gz")
     net = Network([
         ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28), 
                       filter_shape=(20, 1, 5, 5), 
