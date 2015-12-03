@@ -330,3 +330,22 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
+
+if __name__ == '__main__':
+    import time;
+    localtime = time.asctime( time.localtime(time.time()) )
+    print "Local current time :", localtime
+    
+    import mnist_loader
+    training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+    net = Network([784, 30, 10], cost=CrossEntropyCost)
+    net.large_weight_initializer()
+    net.SGD(training_data, 30, 10, .5,evaluation_data=validation_data, monitor_evaluation_accuracy=True)
+    
+    localtime = time.asctime( time.localtime(time.time()) )
+    print "Local current time :", localtime
+    
+
+
+
+

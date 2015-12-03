@@ -39,7 +39,11 @@ def load_data():
     That's done in the wrapper function ``load_data_wrapper()``, see
     below.
     """
+#    import os
+#    print "current working dir : %s" % os.getcwd()
     f = gzip.open('../data/mnist.pkl.gz', 'rb')
+#    f = gzip.open('../data/mnist_shuffled0.pkl.gz', 'rb')
+#    f = gzip.open('../data/mnist_expanded.pkl.gz', 'rb')
     training_data, validation_data, test_data = cPickle.load(f)
     f.close()
     return (training_data, validation_data, test_data)

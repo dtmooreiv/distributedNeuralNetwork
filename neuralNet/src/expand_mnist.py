@@ -1,3 +1,4 @@
+
 """expand_mnist.py
 ~~~~~~~~~~~~~~~~~~
 
@@ -23,12 +24,6 @@ import random
 
 # Third-party libraries
 import numpy as np
-
-import cv2
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-
-
 
 print("Expanding the MNIST training set")
 
@@ -58,19 +53,6 @@ else:
             else: 
                 new_img[:, index] = np.zeros(28)
             expanded_training_pairs.append((np.reshape(new_img, 784), y))
-        
-        for rotation in [ -4, -2, 2, 4]:
-        
-            rows,cols = image.shape
-
-            M = cv2.getRotationMatrix2D((cols/2,rows/2),rotation,1)
-            dst = cv2.warpAffine(image,M,(cols,rows))
-            #plt.imshow(dst, cmap = cm.Greys_r)
-            #plt.show()
-            
-            expanded_training_pairs.append((np.reshape(dst, 784), y))
-
-        
     random.shuffle(expanded_training_pairs)
     expanded_training_data = [list(d) for d in zip(*expanded_training_pairs)]
     print("Saving expanded data. This may take a few minutes.")
