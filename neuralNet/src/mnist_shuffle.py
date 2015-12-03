@@ -17,8 +17,8 @@ from __future__ import print_function
 outputpath = "../data/mnist_shuffled"
 outputpathpostfix = ".pkl.gz"
 partitions = 1
-shift_flag = 1
-rotate_flag = 1
+shift_flag = 0 #for default expansion change this flag to 1. This adds 4 shifts for each image
+rotate_flag = 0 #for more expansion change this flag to 1. This adds 10 rotations to each of the 4 shifts
 import cv2 #for rotations
 
 
@@ -57,7 +57,7 @@ else:
         j += 1
         if j % 1000 == 0: 
             print("Expanding image number", j)
-        else: continue
+        
         expanded_training_pairs.append((x, y))
         expansion_counter=expansion_counter+1
         image = np.reshape(x, (-1, 28))
