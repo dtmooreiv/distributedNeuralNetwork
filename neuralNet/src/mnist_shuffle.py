@@ -16,7 +16,7 @@ from __future__ import print_function
 
 outputpath = "../data/mnist_shuffled"
 outputpathpostfix = ".pkl.gz"
-partitions = 1
+partitions = 3
 shift_flag = 0 #for default expansion change this flag to 1. This adds 4 shifts for each image
 rotate_flag = 0 #for more expansion change this flag to 1. This adds 10 rotations to each of the 4 shifts
 import cv2 #for rotations
