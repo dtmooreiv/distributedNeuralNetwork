@@ -338,3 +338,4 @@ if __name__ == '__main__':
     net.large_weight_initializer()
     print('starting training')
     net.SGD(training_data, 30, 10, 0.5, evaluation_data=test_data, monitor_evaluation_accuracy=True)
+

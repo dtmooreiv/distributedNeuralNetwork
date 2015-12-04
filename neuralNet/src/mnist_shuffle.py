@@ -17,6 +17,10 @@ from __future__ import print_function
 outputpath = "../data/mnist_shuffled"
 outputpathpostfix = ".pkl.gz"
 partitions = 3
+shift_flag = 0 #for default expansion change this flag to 1. This adds 4 shifts for each image
+rotate_flag = 0 #for more expansion change this flag to 1. This adds 10 rotations to each of the 4 shifts
+import cv2 #for rotations
+
 
 #### Libraries
 
@@ -48,42 +52,63 @@ else:
     f.close()
     expanded_training_pairs = []
     j = 0 # counter
+    expansion_counter = 0
     for x, y in zip(training_data[0], training_data[1]):
-        expanded_training_pairs.append((x, y))
-        image = np.reshape(x, (-1, 28))
         j += 1
-        if j % 1000 == 0: print("Expanding image number", j)
+        if j % 1000 == 0: 
+            print("Expanding image number", j)
+        
+        expanded_training_pairs.append((x, y))
+        expansion_counter=expansion_counter+1
+        image = np.reshape(x, (-1, 28))
         # iterate over data telling us the details of how to
         # do the displacement
-        for d, axis, index_position, index in [
-                (1,  0, "first", 0),
-                (-1, 0, "first", 27),
-                (1,  1, "last",  0),
-                (-1, 1, "last",  27)]:
-            new_img = np.roll(image, d, axis)
-            if index_position == "first": 
-                new_img[index, :] = np.zeros(28)
-            else: 
-                new_img[:, index] = np.zeros(28)
-            expanded_training_pairs.append((np.reshape(new_img, 784), y))
+        if shift_flag ==1 :
+            for d, axis, index_position, index in [
+                    (1,  0, "first", 0),
+                    (-1, 0, "first", 27),
+                    (1,  1, "last",  0),
+                    (-1, 1, "last",  27)]:
+                new_img = np.roll(image, d, axis)
+                if index_position == "first": 
+                    new_img[index, :] = np.zeros(28)
+                else: 
+                    new_img[:, index] = np.zeros(28)
+                expanded_training_pairs.append((np.reshape(new_img, 784), y))
+                expansion_counter=expansion_counter+1
+
+                if rotate_flag ==1 :
+                    for rotation in [ -10,-8,-6,-4, -2, 2, 4,6,8,10]:
+                    
+                        rows,cols = new_img.shape
+            
+                        M = cv2.getRotationMatrix2D((cols/2,rows/2),rotation,1)
+                        dst = cv2.warpAffine(new_img,M,(cols,rows))
+                        #plt.imshow(dst, cmap = cm.Greys_r)
+                        #plt.show()
+                        expanded_training_pairs.append((np.reshape(dst, 784), y))
+                        expansion_counter=expansion_counter+1
         
 
     random.shuffle(expanded_training_pairs)
-    print("Shuffling done")
+    print("Shuffling done, total images after expansion=",expansion_counter)
 
     partition_size = int(math.ceil(float(len(expanded_training_pairs))/partitions))    
         
-    expanded_training_data = [list(d) for d in zip(*[expanded_training_pairs])]
+    expanded_training_data = [list(d) for d in zip(*expanded_training_pairs)]
     print("Saving shuffled data in "+str(partitions)+" partitions. This may take a few minutes.")
     for x in range(0,partitions):
         filename = outputpath+str(x)+outputpathpostfix
         f = gzip.open(filename, "w")
         partition_begin = x*partition_size
         partition_end =(x+1)*partition_size
+        partitioned_expanded_training_data =  []
         if x != partitions-1:#this is so we don't accidently grab something out of bounds. in the final case we just go to the end.
-            cPickle.dump((expanded_training_data[partition_begin:partition_end], validation_data, test_data), f)
+            partitioned_expanded_training_data = (expanded_training_data[partition_begin:partition_end])
         else:
-            cPickle.dump((expanded_training_data[partition_begin:], validation_data, test_data), f)
+            partitioned_expanded_training_data = (expanded_training_data[partition_begin:])
+            
+        cPickle.dump((partitioned_expanded_training_data, validation_data, test_data), f)
 
         f.close()
         print("done with saving file " + str(x) + " at location"+ filename) 
