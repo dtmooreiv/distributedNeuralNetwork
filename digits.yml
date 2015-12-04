@@ -6,9 +6,27 @@
     - name: Apt tasks
       apt: update_cache=yes
       apt: upgrade=dist
+      apt: name=libjpeg8-dev state=latest
+      apt: name=libtiff4-dev state=latest
+      apt: name=libjasper-dev state=latest
+      apt: name=libpng12-dev state=latest
+      apt: name=libgtk2.0-dev state=latest
+      apt: name=libatlas-base-dev state=latest
+      apt: name=gfortran state=latest
+      apt: name=cmake state=latest
     - name: Copy over neuralNets
       copy: src=neuralNet dest=/home/ubuntu/ owner=ubuntu group=ubuntu
+    - name: Copy over files
+      copy: src=hosts dest=/home/ubuntu/ owner=ubuntu group=ubuntu
+      copy: src=slaves dest=/home/ubuntu/ owner=ubuntu group=ubuntu
+      copy: src=params.save dest=/home/ubuntu/ owner=ubuntu group=ubuntu
     - name: Copy over public keys
       lineinfile: dest=/home/ubuntu/.ssh/authorized_keys line="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8BCF79erYQjyiWlzSyJs+SCiGr6D9nkb6QVMTaQFykF4wt1OzSdZR6apN4lB8YVIt9DHDZ5DlFPWuLL6D+kkeBpRtCJNaYhS7BEsk8y23pE1ZfY+lt3AnfD7171X3Rn7o1PYGNo1ucB2LP3HXMfhz9poowGRIN4a6v9idGyduTI+zOWM33Lb+9Gt4ktX4BpBMzYNmD3qGsRbE0q8p/WzXt8frTxOM4XqikUFdIO2CnF262rQR9rYZ1b/9psZ6n2DHHf9LrP84P1ZeJ3VzRvZQ+hNryUQwyfkPR7qB5t1kWtoRXfDsXeUjDI+yX4Ge6od2RVsBL/RsOdPY2aUiolTaRdnmPd6mETrG83WV/bEcml84xRouXY8rEeF1Po+YctfGjskn5oLZCRxlc/KHyY2ZCjdY3p4GSwoSpiwDGLB5VtlNYkhsbkgAllOflhGdeon7+Y4LuqXwzpocvtrRs5m5h1VT/cBmOuRLNCDp2x8DpntLQUXgrQN50f4lClj9NrdbTT9rndmh47oPfnBL3xrn8n5dUw5VlTxvuXaTr+Rf24DW+/w7upklTz60Qo04FQPktvTc5o+vIM2kBBHKv7uGug02kPLVfIZRnZtfU/tD92GjmeEpTL1M30ZgGCx1n8vjmLXnt5t80bPDFJYG2xkscWSTWEcUdJRR7Qkup7m3Uw== mxu@ncsu.edu" 
     - name: Install neuralNet requirements.txt
       pip: requirements=/home/ubuntu/neuralNet/requirements.txt
+    - name: Git Cloning
+      git: repo=https://github.com/Itseez/opencv_contrib.git dest=/home/ubuntu/opencv_contrib clone=yes version=3.0.0
+    - name: More git clone
+      git: repo=https://github.com/Itseez/opencv.git dest=/home/ubuntu/opencv clone=yes version=3.0.0
+    - name: Run Manual Installations
+      script: opencv_install.sh

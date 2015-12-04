@@ -1,0 +1,5 @@
+- hosts: slaves
+  user: ubuntu
+  tasks:
+    - name: Start slaves
+      shell: '/usr/bin/python2.7 /home/ubuntu/neuralNet/src/network_slave.py &'
