@@ -41,31 +41,35 @@ def main(argv):
     outputpath = "../data/mnist_shuffled"
     outputpathpostfix = ".pkl.gz"
     partitions = 3
-    shift_flag = 0 #for default expansion change this flag to 1. This adds 4 shifts for each image
-    shift_and_rotate_flag = 0 #for more expansion change this flag to 1. This adds 10 rotations to each of the 4 shifts
+    shifts = 0 #
+    rotations = 0 #
 
+####################################################################################################################################################################
     try:
-        opts, args = getopt.getopt(argv,"hp:sr",["help=","partitions=","shift_flag","shift_and_rotate_flag"])
+        opts, args = getopt.getopt(argv,"hp:s:r:",["help=","partitions=","shifts","rotations"])
     except getopt.GetoptError:
-        print("eror with parsing options. going with defaults. partitions=",partitions," shift_flag =",shift_flag," shift_and_rotate_flag=",shift_and_rotate_flag)
+        print("eror with parsing options. going with defaults. partitions=",partitions," shifts =",shifts," rotations=",rotations)
 #    if not("-p" in opts or "--partitions" in opts):
 #        print("partitions option not specified, going with the default of ",partitions)
 
     for opt, arg in opts:
         if opt in ("-h","--help"):
-            print ('mnist_shuffle.py -p <# of partitions> -s -r')
+            print ('mnist_shuffle.py -p <# of partitions> -s<# max distance of shifts> -r<# of rotations>')
             sys.exit()
         elif opt in ("-p", "--partitions"):
             partitions = arg
             partitions=int(partitions) #partitions as a command line arguement is read as a float. we expect it to be an int
             print("partitions=",partitions)
-        elif opt in ("-s", "--shift_flag"):
-            shift_flag=1
-            print("shift_flag=",shift_flag)
-        elif opt in ("-r", "--shift_and_rotate_flag"):
-            shift_and_rotate_flag=1
-            print("shift_and_rotate_flag=",shift_and_rotate_flag)
-    
+        elif opt in ("-s", "--shifts"):
+            shifts= arg
+            shifts = int(shifts)
+            print("shifts=",shifts)
+        elif opt in ("-r", "--rotations"):
+            rotations=arg
+            rotations=int(rotations)
+            print("rotations=",rotations)
+
+####################################################################################################################################################################    
     if os.path.exists(outputpath):
         print("The shuffled training set already exists.  Exiting.")
     else:
@@ -86,32 +90,40 @@ def main(argv):
             image = np.reshape(x, (-1, 28))
             # iterate over data telling us the details of how to
             # do the displacement
-            if (shift_flag ==1 or shift_and_rotate_flag ==1) :
-                for d, axis, index_position, index in [
-                        (1,  0, "first", 0),
-                        (-1, 0, "first", 27),
-                        (1,  1, "last",  0),
-                        (-1, 1, "last",  27)]:
-                    new_img = np.roll(image, d, axis)
-                    if index_position == "first": 
-                        new_img[index, :] = np.zeros(28)
-                    else: 
-                        new_img[:, index] = np.zeros(28)
-                    expanded_training_pairs.append((np.reshape(new_img, 784), y))
-                    expansion_counter=expansion_counter+1
-    
-                    if shift_and_rotate_flag ==1 :
-                        for rotation in [ -10,-8,-6,-4, -2, 2, 4,6,8,10]:
-                        
-                            rows,cols = new_img.shape
+            if (shifts >=1 or rotations >=1) :
+                if rotations >=1 and shifts == 0:
+                    shifts = 1
+                    print("changing shifts to ",shifts)
+                for distance in range(1,shifts+1):
+                    for d, axis, index_position, index in [
+                            (distance,  0, "first1", 0),
+                            (-distance, 0, "first2", 27),
+                            (distance,  1, "last1",  0),
+                            (-distance, 1, "last2",  27)]:
+                        new_img = np.roll(image, d, axis)
+                        if index_position == "first1": 
+                            new_img[index:index+distance, :] = np.zeros(28*distance).reshape((distance,28))
+                        elif index_position == "first2": 
+                            new_img[index-distance:index, :] = np.zeros(28*distance).reshape((distance,28))
+                        elif index_position == "last1": 
+                            new_img[:, index:index+distance] = np.zeros((28*distance)).reshape((28,distance))
+                        elif index_position == "last2": 
+                            new_img[:, index-distance:index] = np.zeros((28*distance)).reshape((28,distance))
+                        expanded_training_pairs.append((np.reshape(new_img, 784), y))
+                        expansion_counter=expansion_counter+1
+        
+                        if rotations >=1 :
+                            for rotation in range(-rotations,rotations,2) : #step size 2 because we go both ways from zero, also so the rotations aren't too close to each other
+                            
+                                rows,cols = new_img.shape
+                    
+                                M = cv2.getRotationMatrix2D((cols/2,rows/2),rotation,1)
+                                dst = cv2.warpAffine(new_img,M,(cols,rows))
+                                #plt.imshow(dst, cmap = cm.Greys_r)
+                                #plt.show()
+                                expanded_training_pairs.append((np.reshape(dst, 784), y))
+                                expansion_counter=expansion_counter+1
                 
-                            M = cv2.getRotationMatrix2D((cols/2,rows/2),rotation,1)
-                            dst = cv2.warpAffine(new_img,M,(cols,rows))
-                            #plt.imshow(dst, cmap = cm.Greys_r)
-                            #plt.show()
-                            expanded_training_pairs.append((np.reshape(dst, 784), y))
-                            expansion_counter=expansion_counter+1
-            
     
         random.shuffle(expanded_training_pairs)
         print("Shuffling done, total images after expansion=",expansion_counter)
