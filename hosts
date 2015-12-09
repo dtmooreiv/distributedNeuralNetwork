@@ -1,0 +1,7 @@
+[awsEc2]
+52.53.238.70 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
+54.153.19.57 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
+54.153.9.248 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
+54.153.6.118 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
+54.153.7.227 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
+54.67.61.252 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/Users/dana/.ssh/mac_aws_west.pem
