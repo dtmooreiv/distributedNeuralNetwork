@@ -69,7 +69,7 @@ def main(argv):
             rotations=int(rotations)
             print("rotations=",rotations)
         
-    partition_size = int(math.ceil((50000+50000*4*shifts+50000*4*rotations)/partitions))    
+    partition_size = int(math.ceil((50000+(50000*4*shifts)+(50000*4*shifts*rotations))/partitions))    
 
 ####################################################################################################################################################################    
     if os.path.exists(outputpath):
